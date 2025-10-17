@@ -1,0 +1,10 @@
+{
+  "appId": "com.mtgfinder.app",
+  "appName": "MTG Card Finder",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "server": {
+    "url": "https://strangextame.pythonanywhere.com/",
+    "cleartext": true
+  }
+}
