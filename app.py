@@ -9,6 +9,7 @@ Scryfall API.
 from flask import Flask, render_template, request, Response
 # Import the Scryfall client wrapper
 from scryfall_client import fetch_card
+import re
 
 app = Flask(__name__)
 
@@ -35,6 +36,17 @@ def search() -> Response:
     """
     # Get the card name that the user entered in the form
     card_name = request.form['card_name']
+    # Sanitize and validate input
+    card_name = card_name.strip()
+    if not card_name:
+        error_message = "Card name cannot be empty."
+        return render_template('error.html', message=error_message)
+    if len(card_name) > 100:
+        error_message = "Card name is too long."
+        return render_template('error.html', message=error_message)
+    if not re.fullmatch(r"[A-Za-z0-9\-\s]+", card_name):
+        error_message = "Card name contains invalid characters."
+        return render_template('error.html', message=error_message)
 
     # Use the Scryfall client to fetch card data with timeout handling
     card_data = fetch_card(card_name)
@@ -63,6 +75,17 @@ def search() -> Response:
         # Render a user‑friendly error page
         error_message = f"Sorry, the card '{card_name}' was not found."
         return render_template('error.html', message=error_message)
+
+# Graceful error handlers
+@app.errorhandler(404)
+def not_found(error):
+    """Render a user‑friendly 404 page."""
+    return render_template('error.html', message="Page not found."), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    """Render a user‑friendly 500 page."""
+    return render_template('error.html', message="An unexpected error occurred."), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
