@@ -9,6 +9,9 @@ No context variables are required.
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Magic Card Search</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <body>
@@ -19,5 +22,21 @@ No context variables are required.
     <button type="submit">Search</button>
 </form>
     </div>
+    <div class="container">
+    <h1>Magic: The Gathering Card Search</h1>
+    <form action="/search" method="post" class="search-form">
+        </form>
+    <div id="loading-message" style="display: none; text-align: center; margin-top: 20px;">
+        <p>Searching the library...</p>
+    </div>
+</div>
+<script>
+    const searchForm = document.querySelector('.search-form');
+    const loadingMessage = document.getElementById('loading-message');
+
+    searchForm.addEventListener('submit', function() {
+        loadingMessage.style.display = 'block';
+    });
+</script>
 </body>
 </html>
