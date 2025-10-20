@@ -11,23 +11,22 @@ Expects the following context variables:
 <html lang="en">
 <head>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Results</title>
-    <style>
-        body { font-family: sans-serif; margin: 2em; }
-        .card-container { display: flex; gap: 20px; }
-        .card-details { max-width: 400px; }
-        img { max-width: 300px; border-radius: 15px; }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <a href="/">&larr; Back to Search</a>
+
+    <div class="container">  <a href="/">&larr; Back to Search</a>
         <hr>
+
         <div class="card-container">
-            ...
+            <img src="{{ image_url }}" alt="Image for {{ name }}">
+            <div class="card-details">
+                <h1>{{ name }}</h1>
+                <p><strong>Mana Cost:</strong> {{ mana_cost }}</p>
+                <p><strong>Type:</strong> {{ type_line }}</p>
+                <p><em>{{ oracle_text }}</em></p>
+            </div>
         </div>
-    </div>
-</body>
+
+    </div> </body>
+</html>
 </html>

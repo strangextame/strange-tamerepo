@@ -17,6 +17,9 @@ body {
     padding: 2em;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    /* The next two lines are new/adjusted */
+    display: flex;
+    flex-direction: column; /* This tells flex items to stack vertically */
 }
 
 /* Styling for the main search form */
