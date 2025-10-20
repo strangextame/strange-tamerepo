@@ -10,6 +10,7 @@ Expects the following context variables:
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search Results</title>
@@ -21,18 +22,12 @@ Expects the following context variables:
     </style>
 </head>
 <body>
-    <a href="/">&larr; Back to Search</a>
-    <hr>
-
-    <div class="card-container">
-        <img src="{{ image_url }}" alt="Image for {{ name }}">
-        <div class="card-details">
-            <h1>{{ name }}</h1>
-            <p><strong>Mana Cost:</strong> {{ mana_cost }}</p>
-            <p><strong>Type:</strong> {{ type_line }}</p>
-            <p><em>{{ oracle_text }}</em></p>
+    <div class="container">
+        <a href="/">&larr; Back to Search</a>
+        <hr>
+        <div class="card-container">
+            ...
         </div>
     </div>
-    
 </body>
 </html>
