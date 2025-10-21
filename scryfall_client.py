@@ -22,6 +22,8 @@ if not logger.handlers:
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)
 
+SCRYFALL_API_BASE_URL = "https://api.scryfall.com"
+session = requests.Session()
 
 def fetch_card(card_name: str, timeout: int = 5) -> Optional[Dict[str, Any]]:
     """
@@ -35,9 +37,9 @@ def fetch_card(card_name: str, timeout: int = 5) -> Optional[Dict[str, Any]]:
         A dictionary with the card data if the request succeeds and the card is
         found, otherwise ``None``.
     """
-    api_url = f"https://api.scryfall.com/cards/named?fuzzy={card_name}"
+    api_url = f"{SCRYFALL_API_BASE_URL}/cards/named"
     try:
-        response = requests.get(api_url, timeout=timeout)
+        response = session.get(api_url, params={"fuzzy": card_name}, timeout=timeout)
         if response.status_code == 200:
             logger.info("Successfully fetched card data for '%s'.", card_name)
             return response.json()
