@@ -102,7 +102,7 @@ def search() -> Response:
 # Graceful error handlers
 @app.errorhandler(404)
 def not_found(error):
-    """Render a user‑friendly 404 page."""
+    """Render a user-friendly 404 page."""
     return render_template('error.html', message="Page not found."), 404
 
 @app.errorhandler(500)
