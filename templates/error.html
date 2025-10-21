@@ -1,22 +1,16 @@
-<!--
-Error page template: displays an error message when a card is not found.
-Expects the following context variable:
-- message: Human‑readable error description
--->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-</head>
-<body>
-    <h1>Oops!</h1>
-    <p>{{ message }}</p>
-    <a href="/" class="back-link">&larr; Back to Search</a>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Error{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 col-lg-6 mx-auto">
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">An Error Occurred</h4>
+            <p>{{ message }}</p>
+            <hr>
+            <a href="/" class="btn btn-secondary mb-0">Try Again</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

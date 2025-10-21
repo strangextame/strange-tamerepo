@@ -8,10 +8,31 @@ Scryfall API.
 # We need 'request' to access the data sent by the user's form
 from flask import Flask, render_template, request, Response
 # Import the Scryfall client wrapper
+from markupsafe import Markup
 from scryfall_client import fetch_card
 import re
 
 app = Flask(__name__)
+
+@app.template_filter('mana')
+def mana_symbols(mana_cost_str: str) -> Markup:
+    """
+    A Jinja2 filter to convert mana symbols like {W} in a string into images.
+    Example: "{T}: Add {C}{C}" -> "<img>: Add <img><img>"
+    """
+    if not mana_cost_str or mana_cost_str == 'N/A':
+        return 'N/A'
+
+    def replace_with_img(match):
+        """This function is called for each matched mana symbol."""
+        symbol = match.group(0)
+        # Sanitize the symbol code for the URL (e.g., {2/U} -> 2U)
+        symbol_code = symbol.strip('{}').replace('/', '').upper()
+        return f'<img src="https://svgs.scryfall.io/card-symbols/{symbol_code}.svg" alt="{symbol}" class="mana-symbol" title="{symbol}">'
+
+    # Use re.sub to find all mana symbols and replace them using our helper function
+    # The result is wrapped in Markup to tell Jinja it's safe to render as HTML
+    return Markup(re.sub(r'({[^}]+})', replace_with_img, mana_cost_str))
 
 @app.route('/')
 def home() -> Response:
@@ -44,7 +65,9 @@ def search() -> Response:
     if len(card_name) > 100:
         error_message = "Card name is too long."
         return render_template('error.html', message=error_message)
-    if not re.fullmatch(r"[A-Za-z0-9\-\s]+", card_name):
+    # Allow a wider range of characters including letters, numbers, spaces,
+    # and common punctuation like apostrophes, commas, colons, and hyphens.
+    if not re.fullmatch(r"[\w\s',:-]+", card_name):
         error_message = "Card name contains invalid characters."
         return render_template('error.html', message=error_message)
 
@@ -64,17 +87,17 @@ def search() -> Response:
         # image_uris may be missing; get nested 'normal' URL safely
         image_url = card_data.get('image_uris', {}).get('normal')
 
-        # Pass all this data to a new HTML template
-        return render_template('results.html', 
-                               name=name, 
-                               mana_cost=mana_cost, 
-                               type_line=type_line, 
-                               oracle_text=oracle_text,
-                               image_url=image_url)
     else:
         # Render a user‑friendly error page
         error_message = f"Sorry, the card '{card_name}' was not found."
         return render_template('error.html', message=error_message)
+    # Pass all this data to a new HTML template
+    return render_template('results.html',
+                           name=name,
+                           mana_cost=mana_cost,
+                           type_line=type_line,
+                           oracle_text=oracle_text,
+                           image_url=image_url)
 
 # Graceful error handlers
 @app.errorhandler(404)

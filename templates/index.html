@@ -1,35 +1,22 @@
-<!--
-Home page template: displays a search form.
-No context variables are required.
--->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Magic Card Search</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-</head>
-<body>
-    <body>
-    <div class="container">
-        <h1>Magic: The Gathering Card Search</h1>
-       <form action="/search" method="post" class="search-form">
-    <input type="text" name="card_name" placeholder="Enter card name...">
-    <button type="submit">Search</button>
-</form>
-    
-</div>
-<script>
-    const searchForm = document.querySelector('.search-form');
-    const loadingMessage = document.getElementById('loading-message');
+{% extends "base.html" %}
 
-    searchForm.addEventListener('submit', function() {
-        loadingMessage.style.display = 'block';
-    });
-</script>
-</body>
-</html>
+{% block title %}Search for a Card{% endblock %}
+
+{% block content %}
+<div class="p-4 p-md-5 mb-4 rounded-3 bg-body-tertiary">
+  <div class="container-fluid">
+    <h1 class="display-5 fw-bold">Magic Card Search</h1>
+    <p class="col-md-8 fs-4">Enter a card name to search the Scryfall database.</p>
+    
+    <!-- This form will now POST directly to your Flask server -->
+    <form action="/search" method="POST" class="row">
+      <div class="col-lg-8">
+        <div class="input-group">
+          <input type="text" name="card_name" class="form-control form-control-lg" placeholder="e.g., Sol Ring" aria-label="Card name" required autofocus>
+          <button class="btn btn-primary btn-lg" type="submit">Search</button>
+          </div>
+        </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
