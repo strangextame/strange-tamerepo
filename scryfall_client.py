@@ -17,30 +17,31 @@ logger = logging.getLogger(__name__)
 SCRYFALL_API_BASE_URL = "https://api.scryfall.com"
 session = requests.Session()
 
-def fetch_cards(query: str, timeout: int = 5) -> Optional[List[Dict[str, Any]]]:
+def fetch_cards(query: str, page: int = 1, timeout: int = 5) -> Optional[Dict[str, Any]]:
     """
     Retrieve a list of cards from the Scryfall API.
 
     Args:
         query: The Scryfall search query string.
+        page: The page number of the results to fetch.
         timeout: Number of seconds to wait for the HTTP request before aborting.
 
     Returns:
-        A list of card data dictionaries if the request succeeds and cards are
-        found, otherwise ``None``.
+        A dictionary containing card data and pagination info, or ``None``.
     """
     # Use the /search endpoint which is more flexible. `q=` is the query parameter.
     api_url = f"{SCRYFALL_API_BASE_URL}/cards/search"
     try:
         # The `q` parameter can include Scryfall's powerful search syntax.
         # We'll ask for cards in English and sorted by price for relevance
-        params = {"q": f"{query} lang:en", "order": "usd"}
+        params = {"q": f"{query} lang:en", "order": "usd", "page": page}
         response = session.get(api_url, params=params, timeout=timeout)
         if response.status_code == 200:
             search_results = response.json()
             if search_results.get("data"):
                 logger.info("Successfully fetched %d cards for query '%s'.", len(search_results["data"]), query)
-                return search_results["data"]
+                # Return the whole search result object which includes pagination info
+                return search_results
             logger.warning("Scryfall search for '%s' returned no results.", query)
             return None
         else:

@@ -61,8 +61,8 @@ def autocomplete() -> Response:
     # Return the list of suggestions as a JSON response
     return jsonify(suggestions)
 
-# Route to handle card search (POST only)
-@app.route('/search', methods=['POST'])
+# Route to handle card search (handles POST for new search, GET for pagination)
+@app.route('/search', methods=['GET', 'POST'])
 def search() -> Response:
     """Handle card search requests.
 
@@ -72,10 +72,20 @@ def search() -> Response:
     Returns:
         flask.Response: Rendered ``results.html`` with card data or ``error.html`` with an error message.
     """
-    # Get the card name that the user entered in the form
-    card_name = request.form['search_query']
-    card_type = request.form.get('card_type', '') # Use .get for the optional type
-    # Sanitize and validate input
+    if request.method == 'POST':
+        # New search from the form
+        card_name = request.form.get('search_query', '')
+        card_type = request.form.get('card_type', '')
+        page = 1
+    else: # request.method == 'GET'
+        # Navigating via pagination links
+        card_name = request.args.get('search_query', '')
+        card_type = request.args.get('card_type', '')
+        # Ensure page is an integer, default to 1
+        page = request.args.get('page', 1, type=int)
+
+
+    # --- Input validation and query building ---
     card_name = card_name.strip()
     if not card_name:
         error_message = "Card name cannot be empty."
@@ -95,15 +105,20 @@ def search() -> Response:
         # Add the type filter to the query, e.g., "Sol Ring type:artifact"
         query += f" type:{card_type}"
 
-    # Use the Scryfall client to fetch a list of cards
-    cards_data = fetch_cards(query)
+    # Use the Scryfall client to fetch a page of cards
+    search_result = fetch_cards(query, page=page)
 
     # Verify that we received data from the client
-    if cards_data:
-        # Pass the list of cards and the original search term to the template
+    if search_result and search_result.get("data"):
+        # Pass the list of cards and all necessary pagination data to the template
         return render_template('results.html',
-                               cards=cards_data,
-                               search_term=card_name)
+                               cards=search_result.get("data", []),
+                               search_term=card_name,
+                               card_type=card_type,
+                               page=page,
+                               has_more=search_result.get("has_more", False),
+                               total_cards=search_result.get("total_cards", 0)
+                               )
     else:
         # Render a user‑friendly error page
         error_message = f"Sorry, no cards matching your search for '{query}' were found."
