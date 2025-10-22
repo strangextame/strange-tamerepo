@@ -56,9 +56,23 @@
 
         // Fetch suggestions from our new /autocomplete endpoint
         fetch(`{{ url_for('autocomplete') }}?q=${encodeURIComponent(query)}`)
-          .then(response => response.json())
+          .then(response => {
+            // Check if the HTTP response is successful
+            if (!response.ok) {
+              console.error('Network response was not ok:', response.status, response.statusText);
+              // Stop processing and trigger the .catch()
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          })
           .then(data => {
+            // This is the suggestion from your counterpart: log the received data.
+            console.log('Received suggestions:', data);
             suggestionsDatalist.innerHTML = data.map(item => `<option value="${item}"></option>`).join('');
+          })
+          .catch(error => {
+            // This will catch network errors or errors from the .then() blocks.
+            console.error('Error fetching autocomplete suggestions:', error);
           });
       }, 250); // Wait 250ms after user stops typing
     });
