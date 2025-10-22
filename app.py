@@ -73,7 +73,7 @@ def search() -> Response:
         flask.Response: Rendered ``results.html`` with card data or ``error.html`` with an error message.
     """
     # Get the card name that the user entered in the form
-    card_name = request.form['card_name']
+    card_name = request.form['search_query']
     card_type = request.form.get('card_type', '') # Use .get for the optional type
     # Sanitize and validate input
     card_name = card_name.strip()

@@ -38,6 +38,16 @@
         height: 1em;
         vertical-align: -0.125em; /* Aligns symbols nicely with text */
       }
+      /* Styles for the autocomplete suggestions panel */
+      .suggestions-container {
+        position: relative;
+      }
+      #suggestions-panel {
+        position: absolute; /* Position relative to its parent .suggestions-container */
+        top: 100%; /* Place it directly below the input */
+        left: 0;
+        display: none; /* Hidden by default */
+      }
     </style>
     {% block head %}{% endblock %}
 </head>
