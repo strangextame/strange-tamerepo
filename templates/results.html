@@ -20,6 +20,9 @@
             <p class="card-text"><strong>{{ type_line }}</strong></p>
             <div class="card-text mt-3" style="white-space: pre-wrap;">{{ oracle_text | mana }}</div>
           </div>
+          {% if edhrec_link %}
+          <div class="card-footer"><a href="{{ edhrec_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-info w-100">View on EDHREC</a></div>
+          {% endif %}
         </div>
       </div>
     </div>

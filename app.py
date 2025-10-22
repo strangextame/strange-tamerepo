@@ -57,6 +57,7 @@ def search() -> Response:
     """
     # Get the card name that the user entered in the form
     card_name = request.form['card_name']
+    card_type = request.form.get('card_type', '') # Use .get for the optional type
     # Sanitize and validate input
     card_name = card_name.strip()
     if not card_name:
@@ -71,8 +72,14 @@ def search() -> Response:
         error_message = "Card name contains invalid characters."
         return render_template('error.html', message=error_message)
 
+    # Build the Scryfall query string
+    query = card_name
+    if card_type:
+        # Add the type filter to the query, e.g., "Sol Ring type:artifact"
+        query += f" type:{card_type}"
+
     # Use the Scryfall client to fetch card data with timeout handling
-    card_data = fetch_card(card_name)
+    card_data = fetch_card(query)
 
     # Verify that we received data from the client
     if card_data:
@@ -86,10 +93,12 @@ def search() -> Response:
         oracle_text = card_data.get('oracle_text')
         # image_uris may be missing; get nested 'normal' URL safely
         image_url = card_data.get('image_uris', {}).get('normal')
+        # Get the link to the card's EDHREC page
+        edhrec_link = card_data.get('related_uris', {}).get('edhrec')
 
     else:
         # Render a user‑friendly error page
-        error_message = f"Sorry, the card '{card_name}' was not found."
+        error_message = f"Sorry, no cards matching your search for '{card_name}' were found."
         return render_template('error.html', message=error_message)
     # Pass all this data to a new HTML template
     return render_template('results.html',
@@ -97,7 +106,8 @@ def search() -> Response:
                            mana_cost=mana_cost,
                            type_line=type_line,
                            oracle_text=oracle_text,
-                           image_url=image_url)
+                           image_url=image_url,
+                           edhrec_link=edhrec_link)
 
 # Graceful error handlers
 @app.errorhandler(404)
