@@ -39,6 +39,7 @@
         vertical-align: -0.125em; /* Aligns symbols nicely with text */
       }
     </style>
+    {% block head %}{% endblock %}
 </head>
 <body class="d-flex flex-column h-100">
 
@@ -82,5 +83,6 @@
         });
       });
     </script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>
