@@ -1,25 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}Results for {{ name }}{% endblock %}
 {% block title %}Results for "{{ search_term }}"{% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col-12 col-lg-10 col-xl-8 mx-auto">
-    <a href="/" class="btn btn-outline-secondary mb-4">&larr; New Search</a>
-    <div class="card shadow-sm">
-      <div class="row g-0">
-        <div class="col-md-5">
-          {% if image_url %}
-            <img src="{{ image_url }}" class="img-fluid rounded-start w-100" alt="{{ name }}">
-          {% endif %}
-        </div>
-        <div class="col-md-7">
-          <div class="card-body h-100 d-flex flex-column">
-            <h5 class="card-title fs-4">{{ name }}</h5>
-            <h6 class="card-subtitle mb-2 text-body-secondary">{{ mana_cost | mana }}</h6>
-            <p class="card-text"><strong>{{ type_line }}</strong></p>
-            <div class="card-text mt-3" style="white-space: pre-wrap;">{{ oracle_text | mana }}</div>
 <a href="/" class="btn btn-outline-secondary mb-4">&larr; New Search</a>
 <h2 class="mb-4">Results for "{{ search_term }}"</h2>
 
@@ -39,14 +22,11 @@
             <h5 class="card-title mb-1">{{ card.name }}</h5>
             <div class="text-nowrap ms-2">{{ card.mana_cost | mana }}</div>
           </div>
-          {% if edhrec_link %}
-          <div class="card-footer"><a href="{{ edhrec_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-info w-100">View on EDHREC</a></div>
-          {% endif %}
           <p class="card-text text-body-secondary">{{ card.type_line }}</p>
         </div>
       </div>
-    </div>
     </a>
   </div>
   {% endfor %}
 </div>
+{% endblock %}
