@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+
+# IDE / Editor files
+.idea/
+.vscode/
+
+# Node / JavaScript dependencies
+node_modules/
+
+# Android build files
+android/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Logs
+*.log
+
+# OS-generated files
+.DS_Store
+Thumbs.db
