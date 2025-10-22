@@ -103,7 +103,7 @@ def search() -> Response:
         return render_template('error.html', message=error_message)
     # Allow a wider range of characters including letters, numbers, spaces,
     # and common punctuation like apostrophes, commas, colons, and hyphens.
-    if not re.fullmatch(r"[\w\s',:-]+", card_name):
+    if not re.fullmatch(r"[\w\s',:/-]+", card_name):
         error_message = "Card name contains invalid characters."
         return render_template('error.html', message=error_message)
 
