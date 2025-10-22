@@ -41,8 +41,20 @@
     const cardNameInput = document.getElementById('card_name');
     const suggestionsDatalist = document.getElementById('card-suggestions');
     let debounceTimer;
+    
+    // --- Initial Check ---
+    if (!cardNameInput) {
+        console.error('CRITICAL ERROR: Could not find card name input with ID "card_name". Check your HTML.');
+        return; // Stop script execution if essential element is missing
+    }
+    if (!suggestionsDatalist) {
+        console.error('CRITICAL ERROR: Could not find datalist with ID "card-suggestions". Check your HTML.');
+        // Continue, as the input might still work, but autocomplete won't display.
+    }
+    console.log('DOMContentLoaded: Script loaded and elements checked. (Mic Check #0)'); // Mic Check #0
 
     cardNameInput.addEventListener('input', () => {
+      console.log('Event: Input detected (Mic Check #1).'); // Mic Check #1
       // Clear the previous timer to debounce the input
       clearTimeout(debounceTimer);
 
@@ -50,29 +62,35 @@
         const query = cardNameInput.value;
 
         if (query.length < 2) {
-          suggestionsDatalist.innerHTML = ''; // Clear suggestions for short queries
+          console.log('Event: Query too short (< 2 chars). Clearing suggestions.');
+          suggestionsDatalist.innerHTML = ''; 
           return;
         }
+        console.log('Event: Query is long enough. Attempting to fetch suggestions for:', query, '(Mic Check #2).'); // Mic Check #2
 
         // Fetch suggestions from our new /autocomplete endpoint
         fetch(`{{ url_for('autocomplete') }}?q=${encodeURIComponent(query)}`)
           .then(response => {
+            console.log('Fetch Step 1: Received network response (status:', response.status, response.statusText, '). (Mic Check #3)'); // Mic Check #3
             // Check if the HTTP response is successful
             if (!response.ok) {
               console.error('Network response was not ok:', response.status, response.statusText);
-              // Stop processing and trigger the .catch()
               throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
           })
           .then(data => {
-            // This is the suggestion from your counterpart: log the received data.
             console.log('Received suggestions:', data);
-            suggestionsDatalist.innerHTML = data.map(item => `<option value="${item}"></option>`).join('');
+            if (Array.isArray(data) && data.length > 0) {
+                console.log('Populating datalist with', data.length, 'suggestions.');
+                suggestionsDatalist.innerHTML = data.map(item => `<option value="${item}"></option>`).join('');
+            } else {
+                console.log('Received empty or non-array data. Clearing datalist.');
+                suggestionsDatalist.innerHTML = '';
+            }
           })
           .catch(error => {
-            // This will catch network errors or errors from the .then() blocks.
-            console.error('Error fetching autocomplete suggestions:', error);
+            console.error('CRITICAL ERROR: Error fetching autocomplete suggestions:', error); // CRITICAL ERROR
           });
       }, 250); // Wait 250ms after user stops typing
     });
