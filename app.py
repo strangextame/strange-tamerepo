@@ -8,8 +8,8 @@ Scryfall API.
 # We need 'request' to access the data sent by the user's form
 from flask import Flask, jsonify, render_template, request, Response
 # Import the Scryfall client wrapper
-from markupsafe import Markup
-from scryfall_client import fetch_autocomplete_suggestions, fetch_card
+from markupsafe import Markup # Markup is used for the mana filter
+from scryfall_client import fetch_autocomplete_suggestions, fetch_cards # Changed from fetch_card to fetch_cards
 import re
 
 app = Flask(__name__)
@@ -95,38 +95,19 @@ def search() -> Response:
         # Add the type filter to the query, e.g., "Sol Ring type:artifact"
         query += f" type:{card_type}"
 
-    # Use the Scryfall client to fetch card data with timeout handling
-    card_data = fetch_card(query)
+    # Use the Scryfall client to fetch a list of cards
+    cards_data = fetch_cards(query)
 
     # Verify that we received data from the client
-    if card_data:
-        # card_data is already a dict from fetch_card
-        
-        # Extract the specific details we want to display
-        # We use .get() as a safeguard in case a key is missing
-        name = card_data.get('name')
-        mana_cost = card_data.get('mana_cost', 'N/A')
-        type_line = card_data.get('type_line')
-        oracle_text = card_data.get('oracle_text')
-        # image_uris may be missing; get nested 'normal' URL safely
-        image_url = card_data.get('image_uris', {}).get('normal')
-        
-        # For multi-faced cards, the EDHREC link is on the first face.
-        # Otherwise, it's on the top-level object.
-        edhrec_link = card_data.get('related_uris', {}).get('edhrec')
-
+    if cards_data:
+        # Pass the list of cards and the original search term to the template
+        return render_template('results.html',
+                               cards=cards_data,
+                               search_term=card_name)
     else:
         # Render a user‑friendly error page
-        error_message = f"Sorry, no cards matching your search for '{card_name}' were found."
+        error_message = f"Sorry, no cards matching your search for '{query}' were found."
         return render_template('error.html', message=error_message)
-    # Pass all this data to a new HTML template
-    return render_template('results.html',
-                           name=name,
-                           mana_cost=mana_cost,
-                           type_line=type_line,
-                           oracle_text=oracle_text,
-                           image_url=image_url,
-                           edhrec_link=edhrec_link)
 
 # Graceful error handlers
 @app.errorhandler(404)
