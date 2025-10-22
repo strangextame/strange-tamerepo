@@ -8,10 +8,12 @@
     <h1 class="display-5 fw-bold">Magic Card Search</h1>
     <p class="col-md-8 fs-4">Enter a card name to search the Scryfall database.</p>
     
-    <form action="{{ url_for('search') }}" method="POST" class="row g-3 align-items-end">
-      <div class="col-md-6">
+    <form action="{{ url_for('search') }}" method="POST" class="row g-3 align-items-end" autocomplete="off">
+      <div class="col-md-6 suggestions-container">
         <label for="card_name" class="form-label">Card Name</label>
-        <input type="text" name="card_name" id="card_name" class="form-control form-control-lg" placeholder="e.g., Sol Ring" required autofocus>
+        <input type="text" name="search_query" id="card_name" class="form-control form-control-lg" placeholder="e.g., Sol Ring" required autofocus autocomplete="off">
+        <div id="suggestions-panel" class="list-group w-100" style="z-index: 1000;">
+        </div>
       </div>
       <div class="col-md-4">
         <label for="card_type" class="form-label">Card Type</label>
@@ -32,4 +34,9 @@
     </form>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Load the dedicated autocomplete script -->
+<script src="{{ url_for('static', filename='js/autocomplete.js') }}"></script>
 {% endblock %}

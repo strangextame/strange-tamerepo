@@ -38,10 +38,20 @@
         height: 1em;
         vertical-align: -0.125em; /* Aligns symbols nicely with text */
       }
+      /* Styles for the autocomplete suggestions panel */
+      .suggestions-container {
+        position: relative;
+      }
+      #suggestions-panel {
+        position: absolute; /* Position relative to its parent .suggestions-container */
+        top: 100%; /* Place it directly below the input */
+        left: 0;
+        display: none; /* Hidden by default */
+      }
     </style>
     {% block head %}{% endblock %}
 </head>
-<body class="d-flex flex-column h-100">
+<body class="d-flex flex-column h-100" data-autocomplete-url="{{ url_for('autocomplete') }}">
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">

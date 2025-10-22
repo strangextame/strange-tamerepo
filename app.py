@@ -6,10 +6,10 @@ Scryfall API.
 """
 
 # We need 'request' to access the data sent by the user's form
-from flask import Flask, render_template, request, Response
+from flask import Flask, jsonify, render_template, request, Response
 # Import the Scryfall client wrapper
 from markupsafe import Markup
-from scryfall_client import fetch_card
+from scryfall_client import fetch_autocomplete_suggestions, fetch_card
 import re
 
 app = Flask(__name__)
@@ -44,6 +44,23 @@ def home() -> Response:
     # This still just shows our main page with the search bar
     return render_template('index.html')
 
+# Route to provide autocomplete suggestions
+@app.route('/autocomplete')
+def autocomplete() -> Response:
+    """Provide card name suggestions for the search bar."""
+    # Get the partial query from the 'q' URL parameter
+    query = request.args.get('q', '')
+
+    # Don't bother searching for very short queries
+    if len(query) < 2:
+        return jsonify([])
+
+    # Fetch suggestions from our Scryfall client
+    suggestions = fetch_autocomplete_suggestions(query)
+
+    # Return the list of suggestions as a JSON response
+    return jsonify(suggestions)
+
 # Route to handle card search (POST only)
 @app.route('/search', methods=['POST'])
 def search() -> Response:
@@ -56,7 +73,7 @@ def search() -> Response:
         flask.Response: Rendered ``results.html`` with card data or ``error.html`` with an error message.
     """
     # Get the card name that the user entered in the form
-    card_name = request.form['card_name']
+    card_name = request.form['search_query']
     card_type = request.form.get('card_type', '') # Use .get for the optional type
     # Sanitize and validate input
     card_name = card_name.strip()
@@ -93,7 +110,9 @@ def search() -> Response:
         oracle_text = card_data.get('oracle_text')
         # image_uris may be missing; get nested 'normal' URL safely
         image_url = card_data.get('image_uris', {}).get('normal')
-        # Get the link to the card's EDHREC page
+        
+        # For multi-faced cards, the EDHREC link is on the first face.
+        # Otherwise, it's on the top-level object.
         edhrec_link = card_data.get('related_uris', {}).get('edhrec')
 
     else:
