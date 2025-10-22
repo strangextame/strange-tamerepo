@@ -6,7 +6,7 @@ type hints, timeout handling, and basic logging.
 """
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 import requests
 
@@ -61,3 +61,29 @@ def fetch_card(query: str, timeout: int = 5) -> Optional[Dict[str, Any]]:
     except requests.RequestException as exc:
         logger.error("Error contacting Scryfall for query '%s': %s", query, exc)
         return None
+
+def fetch_autocomplete_suggestions(query: str, timeout: int = 3) -> List[str]:
+    """
+    Retrieve card name autocomplete suggestions from the Scryfall API.
+
+    Args:
+        query: The partial card name to get suggestions for.
+        timeout: Request timeout in seconds.
+
+    Returns:
+        A list of card name strings.
+    """
+    api_url = f"{SCRYFALL_API_BASE_URL}/cards/autocomplete"
+    try:
+        response = session.get(api_url, params={"q": query}, timeout=timeout)
+        if response.status_code == 200:
+            results = response.json()
+            suggestions = results.get('data', [])
+            logger.info("Fetched %d suggestions for query '%s'.", len(suggestions), query)
+            return suggestions
+        else:
+            logger.warning("Autocomplete for '%s' returned status %s.", query, response.status_code)
+            return []
+    except requests.RequestException as exc:
+        logger.error("Error contacting Scryfall for autocomplete on '%s': %s", query, exc)
+        return []

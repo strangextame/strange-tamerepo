@@ -11,7 +11,8 @@
     <form action="{{ url_for('search') }}" method="POST" class="row g-3 align-items-end">
       <div class="col-md-6">
         <label for="card_name" class="form-label">Card Name</label>
-        <input type="text" name="card_name" id="card_name" class="form-control form-control-lg" placeholder="e.g., Sol Ring" required autofocus>
+        <input type="text" name="card_name" id="card_name" class="form-control form-control-lg" placeholder="e.g., Sol Ring" required autofocus list="card-suggestions">
+        <datalist id="card-suggestions"></datalist>
       </div>
       <div class="col-md-4">
         <label for="card_type" class="form-label">Card Type</label>
@@ -32,4 +33,35 @@
     </form>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const cardNameInput = document.getElementById('card_name');
+    const suggestionsDatalist = document.getElementById('card-suggestions');
+    let debounceTimer;
+
+    cardNameInput.addEventListener('input', () => {
+      // Clear the previous timer to debounce the input
+      clearTimeout(debounceTimer);
+
+      debounceTimer = setTimeout(() => {
+        const query = cardNameInput.value;
+
+        if (query.length < 2) {
+          suggestionsDatalist.innerHTML = ''; // Clear suggestions for short queries
+          return;
+        }
+
+        // Fetch suggestions from our new /autocomplete endpoint
+        fetch(`/autocomplete?q=${encodeURIComponent(query)}`)
+          .then(response => response.json())
+          .then(data => {
+            suggestionsDatalist.innerHTML = data.map(item => `<option value="${item}"></option>`).join('');
+          });
+      }, 250); // Wait 250ms after user stops typing
+    });
+  });
+</script>
 {% endblock %}
