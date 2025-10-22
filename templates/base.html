@@ -31,9 +31,8 @@
     <style>
       body {
         font-family: 'Inter', sans-serif;
-        /* Add padding to respect the safe area on mobile devices (for Capacitor) */
+        /* Respect the top safe area. Bottom is handled by the watermark logic. */
         padding-top: env(safe-area-inset-top);
-        padding-bottom: env(safe-area-inset-bottom);
         padding-left: env(safe-area-inset-left);
         padding-right: env(safe-area-inset-right);
       }
@@ -53,11 +52,35 @@
         left: 0;
         display: none; /* Hidden by default */
       }
+
+      /* Styles for the fixed Scryfall watermark */
+      #scryfall-watermark-container {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          z-index: 1040; /* Above Bootstrap navbar (1030) */
+          background-color: var(--bs-body-bg); /* Match body background */
+          padding: 5px 15px; /* Base padding */
+          padding-bottom: env(safe-area-inset-bottom); /* Adjust for safe area */
+          text-align: right; /* Position the watermark to the right */
+          border-top: 1px solid var(--bs-border-color); /* Subtle separator */
+          box-shadow: 0 -2px 5px rgba(0,0,0,0.1); /* Optional subtle shadow */
+      }
+      #scryfall-watermark-container .scryfall-watermark-img {
+          height: 20px; /* Size of the logo */
+          opacity: 0.7; /* Watermark effect */
+      }
     </style>
     {% block head %}{% endblock %}
 </head>
 <body class="d-flex flex-column h-100" data-autocomplete-url="{{ url_for('autocomplete') }}">
 
+    <div id="scryfall-watermark-container">
+        <a href="https://scryfall.com/" target="_blank" rel="noopener noreferrer" class="scryfall-watermark-link">
+            <img src="https://svgs.scryfall.io/watermark.svg" alt="Scryfall" class="scryfall-watermark-img">
+        </a>
+    </div>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">Magic Card Finder</a>
@@ -96,6 +119,15 @@
           localStorage.setItem('theme', theme);
           document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme);
         });
+      });
+
+      // Adjust body padding-bottom dynamically to account for the fixed watermark
+      document.addEventListener('DOMContentLoaded', () => {
+          const watermarkContainer = document.getElementById('scryfall-watermark-container');
+          if (watermarkContainer) {
+              const watermarkHeight = watermarkContainer.offsetHeight;
+              document.body.style.paddingBottom = `${watermarkHeight}px`;
+          }
       });
     </script>
     {% block scripts %}{% endblock %}
