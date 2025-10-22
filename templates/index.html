@@ -55,7 +55,7 @@
         }
 
         // Fetch suggestions from our new /autocomplete endpoint
-        fetch(`/autocomplete?q=${encodeURIComponent(query)}`)
+        fetch(`{{ url_for('autocomplete') }}?q=${encodeURIComponent(query)}`)
           .then(response => response.json())
           .then(data => {
             suggestionsDatalist.innerHTML = data.map(item => `<option value="${item}"></option>`).join('');
