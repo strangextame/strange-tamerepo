@@ -53,16 +53,16 @@ def fetch_card(query: str, timeout: int = 5) -> Optional[Dict[str, Any]]:
             return None
         else:
             logger.warning(
-                "Scryfall returned status %s for card '%s'.",
+                "Scryfall search for '%s' returned status %s.",
                 response.status_code,
                 query,
             )
             return None
     except requests.RequestException as exc:
-        logger.error("Error contacting Scryfall for query '%s': %s", query, exc)
+        logger.exception("Scryfall search request failed for query '%s'.", query)
         return None
 
-def fetch_autocomplete_suggestions(query: str, timeout: int = 3) -> List[str]:
+def fetch_autocomplete_suggestions(query: str, timeout: int = 5) -> List[str]:
     """
     Retrieve card name autocomplete suggestions from the Scryfall API.
 
@@ -82,8 +82,8 @@ def fetch_autocomplete_suggestions(query: str, timeout: int = 3) -> List[str]:
             logger.info("Fetched %d suggestions for query '%s'.", len(suggestions), query)
             return suggestions
         else:
-            logger.warning("Autocomplete for '%s' returned status %s.", query, response.status_code)
+            logger.warning("Scryfall autocomplete for '%s' returned status %s.", query, response.status_code)
             return []
     except requests.RequestException as exc:
-        logger.error("Error contacting Scryfall for autocomplete on '%s': %s", query, exc)
+        logger.exception("Scryfall autocomplete request failed for query '%s'.", query)
         return []
