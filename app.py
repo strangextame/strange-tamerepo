@@ -11,8 +11,16 @@ from flask import Flask, jsonify, render_template, request, Response
 from markupsafe import Markup # Markup is used for the mana filter
 from scryfall_client import fetch_autocomplete_suggestions, fetch_cards # Changed from fetch_card to fetch_cards
 import re
+from urllib.parse import quote_plus
 
 app = Flask(__name__)
+
+@app.template_filter('urlencode')
+def urlencode_filter(s: str) -> str:
+    """A Jinja2 filter to URL-encode a string, making it safe for URLs."""
+    if s:
+        return quote_plus(s)
+    return ''
 
 @app.template_filter('mana')
 def mana_symbols(mana_cost_str: str) -> Markup:
