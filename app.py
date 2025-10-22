@@ -110,14 +110,10 @@ def search() -> Response:
         oracle_text = card_data.get('oracle_text')
         # image_uris may be missing; get nested 'normal' URL safely
         image_url = card_data.get('image_uris', {}).get('normal')
-        # Get the link to the card's EDHREC page
-        # First, try the top-level object.
+        
+        # For multi-faced cards, the EDHREC link is on the first face.
+        # Otherwise, it's on the top-level object.
         edhrec_link = card_data.get('related_uris', {}).get('edhrec')
-        # If not found, and it's a multi-faced card, check the first face.
-        if not edhrec_link and 'card_faces' in card_data and card_data['card_faces']:
-            first_face = card_data['card_faces'][0]
-            # The link might be in the first face's related_uris
-            edhrec_link = first_face.get('related_uris', {}).get('edhrec')
 
     else:
         # Render a user‑friendly error page

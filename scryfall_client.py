@@ -13,14 +13,6 @@ import requests
 # Configure a module‑level logger. The application can configure the
 # logging level globally if desired.
 logger = logging.getLogger(__name__)
-if not logger.handlers:
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
 
 SCRYFALL_API_BASE_URL = "https://api.scryfall.com"
 session = requests.Session()

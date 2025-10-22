@@ -41,7 +41,7 @@
     </style>
     {% block head %}{% endblock %}
 </head>
-<body class="d-flex flex-column h-100">
+<body class="d-flex flex-column h-100" data-autocomplete-url="{{ url_for('autocomplete') }}">
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
