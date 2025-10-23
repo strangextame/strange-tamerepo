@@ -1,0 +1,50 @@
+[33mca3711a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mclean-up[m[33m, [m[1;31morigin/clean-up[m[33m)[m Fix: UI Fix 4
+[33md52f0b7[m Fix Attempt 3: UI discrepencies
+[33m8b181ee[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge pull request #5 from strangextame/clean-up
+[33mcf68e11[m Refactor: Externalize CSS/JS, fix results.html card image structure, add consistent card image styling
+[33m17e3e88[m fix: update project name in package-lock.json and add peer flag for tslib
+[33m3b8c7db[m[33m ([m[1;32mmain[m[33m)[m fix: enhance card image display for multi-faced cards
+[33mc96e588[m fix: allow additional characters in card name validation
+[33mbc77136[m n/a minor file change
+[33m0703cc7[m fix: update attribution text for Scryfall API link
+[33m74967d4[m Fix pagination for cards with special characters
+[33mf2d4637[m Make autocomplete suggestions scrollable
+[33me111b4d[m Fix Scryfall attribution link in base.html to be text-based and centered
+[33m09a747e[m Consolidate and fix 'Powered by Scryfall API' link to fixed bottom
+[33mb3ac442[m fix: enhance mobile layout by adjusting body padding and adding fixed Scryfall watermark
+[33maecc139[m fix: enhance card search functionality with pagination support and update results display
+[33mc4048a8[m Fix broken results.html template
+[33m5a2f123[m fix: update results template to display search term and enhance card details layout
+[33m9809a38[m fix: update Scryfall client to fetch multiple cards and enhance HTML templates for better mobile support
+[33mf6f73c5[m fix: update compiled Python bytecode for scryfall_client
+[33m70504a6[m Merge pull request #4 from strangextame/Bootstrap-UI-Integration-Build-2.1
+[33m07e6690[m File restructure
+[33m69f6256[m fix: enhance error handling and improve suggestions panel visibility in autocomplete
+[33m0c6bde2[m fix: rename form input for card search and enhance autocomplete suggestions layout
+[33m9ab7743[m fix: add autocomplete attribute to form for improved user experience
+[33m0b68843[m Restructured HTML files, and added autocomplete.js
+[33ma4bb0c5[m Add log to check data
+[33m5158fa7[m fix: enhance error handling for autocomplete suggestions fetch request
+[33m2ce92ab[m fix: improve logging messages for Scryfall API requests and adjust autocomplete timeout
+[33mb97e562[m fix: update fetch URL for autocomplete suggestions to use url_for for proper routing
+[33mc445eb4[m chore: update compiled Python bytecode for scryfall_client
+[33m5c1b192[m feat: implement autocomplete feature for card search with suggestions from Scryfall API
+[33mb32d74d[m Merge pull request #3 from strangextame/Bootstrap-UI-Integration-Build-2.1
+[33md82ede8[m feat: add card type filter to search and update results display with EDHREC link - autocomplete also implemented in search bar
+[33m883d41c[m chore: remove unused index.html and main.js files
+[33m1c2784a[m feat: enhance base template with head and scripts blocks; update error page link text
+[33mda52af7[m fix: correct typo in 404 error handler docstring
+[33m6cfe1bf[m chore: remove vite from devDependencies in package.json
+[33m31fad32[m Merge pull request #2 from strangextame/Bootstrap-UI-Integration-Build-2.1
+[33mf45a493[m feat: add base HTML template and refactor existing templates
+[33m899efe1[m[33m ([m[1;31morigin/Build-2[m[33m, [m[1;32mBuild-2[m[33m)[m Refactor HTTP response handling and improve Scryfall API client structure
+[33m48c1840[m fixing index.html
+[33m246c8b2[m More UI Impelments, and Updates to CSS/HTML
+[33mb4b72d5[m Updating UI changes.
+[33m172e9eb[m Fix HTML structure by removing duplicate <body> tag in index.html
+[33m79b5b0d[m Changed UI added style.css file, and modified existing html files
+[33mf0c1314[m Merge branch 'fiercebeard-main'
+[33m08c93a0[m[33m ([m[1;31morigin/fiercebeard-main[m[33m, [m[1;32mfiercebeard-main[m[33m)[m Update README.md for improved clarity and accuracy
+[33mf53b710[m Added some error handling.
+[33m2cc684f[m Enhance MTG Card Finder: Add Scryfall API client, improve error handling, and update documentation
+[33m1a831ef[m first commit
