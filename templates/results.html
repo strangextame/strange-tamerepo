@@ -30,7 +30,14 @@
         <div class="card-body"> {# Card body always present #}
           <div class="d-flex justify-content-between align-items-start">
             <h5 class="card-title mb-1">{{ card.name }}</h5>
-            <div class="text-nowrap ms-2">{{ card.mana_cost | mana }}</div>
+            {# Determine the mana cost to display: check card.mana_cost first, then iterate card_faces #}
+            {% set display_cost = card.mana_cost %}
+            {% if not display_cost and card.card_faces %}
+              {% for face in card.card_faces %}
+                {% if face.mana_cost %}{% set display_cost = face.mana_cost %}{% break %}{% endif %}
+              {% endfor %}
+            {% endif %}
+            <div class="text-nowrap ms-2">{{ display_cost | mana }}</div>
           </div>
           <p class="card-text text-body-secondary">{{ card.type_line }}</p>
         </div>

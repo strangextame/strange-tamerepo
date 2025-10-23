@@ -9,10 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Adjust body padding-bottom dynamically to account for the fixed watermark
-  const watermarkContainer = document.getElementById('scryfall-watermark-container');
-  if (watermarkContainer) {
-      const watermarkHeight = watermarkContainer.offsetHeight;
-      document.body.style.paddingBottom = `${watermarkHeight}px`;
-  }
+  // Dynamic padding adjustment for watermark removed as it's no longer fixed.
+  // The flexbox layout in base.html will handle its positioning.
 });

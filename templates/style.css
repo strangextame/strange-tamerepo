@@ -25,15 +25,9 @@ body {
 }
 
 /* Styles for the fixed Scryfall watermark */
-#scryfall-watermark-container {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 1040; /* Above Bootstrap navbar (1030) */
+#scryfall-watermark-container { /* Reverted to non-fixed positioning */
     background-color: var(--bs-body-bg); /* Match body background */
     padding: 5px 15px; /* Base padding */
-    padding-bottom: env(safe-area-inset-bottom); /* Adjust for safe area */
     text-align: center; /* Center the text link */
     border-top: 1px solid var(--bs-border-color); /* Subtle separator */
     box-shadow: 0 -2px 5px rgba(0,0,0,0.1); /* Optional subtle shadow */
