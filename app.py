@@ -120,34 +120,55 @@ def search() -> Response:
     if error_message:
         return render_template('error.html', message=error_message)
 
-    # For new searches, use autocomplete to find the most likely intended card.
-    # This makes partial searches like "delver" resolve to "Delver of Secrets".
-    search_term_for_api = original_search_term
+    # --- Overhauled Search Logic ---
+    # For new searches, we perform two queries:
+    # 1. An "exact" search for the top autocomplete result (most likely card).
+    # 2. A "broad" search for the user's original term.
+    # This allows us to present both result sets in a tabbed interface.
+
+    exact_search_term = None
+    exact_results = None
+    broad_results = None
+    is_ambiguous_search = False
+
     if request.method == 'POST':
-        is_new_search = True
         suggestions = fetch_autocomplete_suggestions(original_search_term)
         if suggestions:
-            # Use Scryfall's exact name syntax: !"Card Name"
-            search_term_for_api = f'!"{suggestions[0]}"'
-    else: # This is a GET request (pagination)
-        is_new_search = False
-    query = search_term_for_api if request.method == 'POST' else original_search_term
-    if card_type:
-        # Add the type filter to the query, e.g., "Sol Ring type:artifact"
-        query += f" type:{card_type}"
+            exact_search_term = suggestions[0]
+            # Only perform two searches if the top suggestion is different from the user's term
+            if original_search_term.lower() != exact_search_term.lower():
+                is_ambiguous_search = True
+                # 1. Get the exact results
+                exact_query = f'!"{exact_search_term}"'
+                if card_type: exact_query += f" type:{card_type}"
+                exact_results = fetch_cards(exact_query, page=1)
 
-    # Use the Scryfall client to fetch a page of cards
-    search_result = fetch_cards(query, page=page)
+        # 2. Get the broad results (or the only results if search was already exact)
+        broad_query = original_search_term
+        if card_type: broad_query += f" type:{card_type}"
+        broad_results = fetch_cards(broad_query, page=page)
+
+    else: # GET request for pagination
+        # For pagination, we only need to query for the broad results.
+        # The "Top Result" tab doesn't need pagination as it shows all printings at once.
+        broad_query = original_search_term
+        if card_type: broad_query += f" type:{card_type}"
+        broad_results = fetch_cards(broad_query, page=page)
+
+    # Determine which result set to use for the main display
+    search_result = broad_results
 
     # Verify that we received data from the client
     if search_result and search_result.get("data"):
         # Pass the list of cards and all necessary pagination data to the template
         return render_template('results.html',
-                               cards=search_result.get("data", []),
+                               # Results for the active tab
+                               cards=exact_results.get("data") if is_ambiguous_search else search_result.get("data", []),
+                               # Separate results for the "All Cards" tab
+                               broad_search_cards=search_result.get("data", []) if is_ambiguous_search else None,
                                search_term=original_search_term, # Display what the user typed
-                               # For new searches, pagination uses the corrected term. For broad searches, it uses the original.
-                               corrected_search_term=search_term_for_api if is_new_search else original_search_term,
-                               is_corrected_search=(search_term_for_api != original_search_term and is_new_search),
+                               is_ambiguous_search=is_ambiguous_search,
+                               exact_search_term=exact_search_term,
                                card_type=card_type,
                                page=page,
                                has_more=search_result.get("has_more", False),
@@ -155,38 +176,7 @@ def search() -> Response:
                                )
     else:
         # Render a user‑friendly error page
-        error_message = f"Sorry, no cards matching your search for '{query}' were found."
-        return render_template('error.html', message=error_message)
-
-@app.route('/search/broad')
-def broad_search() -> Response:
-    """
-    Handles a "broad" search request that does not use the exact name logic.
-    This is used as a fallback from the main, precise search.
-    """
-    card_name = request.args.get('search_query', '')
-    card_type = request.args.get('card_type', '')
-    page = request.args.get('page', 1, type=int)
-
-    query = card_name.strip()
-    if card_type:
-        query += f" type:{card_type}"
-
-    search_result = fetch_cards(query, page=page)
-
-    if search_result and search_result.get("data"):
-        return render_template('results.html',
-                               cards=search_result.get("data", []),
-                               search_term=card_name,
-                               corrected_search_term=card_name, # No correction in broad search
-                               is_corrected_search=False, # This is not a corrected search
-                               card_type=card_type,
-                               page=page,
-                               has_more=search_result.get("has_more", False),
-                               total_cards=search_result.get("total_cards", 0))
-    else:
-        # Render a user‑friendly error page
-        error_message = f"Sorry, no cards matching your search for '{query}' were found."
+        error_message = f"Sorry, no cards matching your search for '{original_search_term}' were found."
         return render_template('error.html', message=error_message)
 
 # Graceful error handlers
