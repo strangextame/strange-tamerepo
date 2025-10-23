@@ -1,0 +1,59 @@
+body {
+  font-family: 'Inter', sans-serif;
+  /* Respect the top safe area. Bottom is handled by the watermark logic. */
+  padding-top: env(safe-area-inset-top);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+/* Style for the mana symbol images */
+.mana-symbol {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em; /* Aligns symbols nicely with text */
+}
+/* Styles for the autocomplete suggestions panel */
+.suggestions-container {
+  position: relative;
+}
+#suggestions-panel {
+  position: absolute; /* Position relative to its parent .suggestions-container */
+  top: 100%; /* Place it directly below the input */
+  left: 0;
+  display: none; /* Hidden by default */
+  max-height: 400px; /* Limit the height of the suggestions */
+  overflow-y: auto;  /* Add a vertical scrollbar when needed */
+}
+
+/* Styles for the fixed Scryfall watermark */
+#scryfall-watermark-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1040; /* Above Bootstrap navbar (1030) */
+    background-color: var(--bs-body-bg); /* Match body background */
+    padding: 5px 15px; /* Base padding */
+    padding-bottom: env(safe-area-inset-bottom); /* Adjust for safe area */
+    text-align: center; /* Center the text link */
+    border-top: 1px solid var(--bs-border-color); /* Subtle separator */
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.1); /* Optional subtle shadow */
+}
+#scryfall-watermark-container .scryfall-attribution-link {
+    font-size: 0.85em; /* Slightly smaller text */
+    color: var(--bs-secondary-color); /* Use secondary text color */
+}
+
+/* Ensure consistent height for card images and center them */
+.card-img-container {
+  height: 320px; /* Fixed height for consistency across all cards */
+  display: flex;
+  flex-direction: column; /* Stack multi-face cards vertically */
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* Hide anything that goes outside */
+}
+.card-img-container img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Ensure image fits within bounds without distortion */
+}
