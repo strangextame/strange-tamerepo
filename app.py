@@ -61,6 +61,19 @@ def autocomplete() -> Response:
     # Return the list of suggestions as a JSON response
     return jsonify(suggestions)
 
+def _validate_card_name(card_name: str) -> str | None:
+    """
+    Validates the card name against a set of rules.
+    Returns an error message string if validation fails, otherwise None.
+    """
+    if not card_name:
+        return "Card name cannot be empty."
+    if len(card_name) > 100:
+        return "Card name is too long."
+    if not re.fullmatch(r"[\w\s',:/-]+", card_name):
+        return "Card name contains invalid characters."
+    return None
+
 # Route to handle card search (handles POST for new search, GET for pagination)
 @app.route('/search', methods=['GET', 'POST'])
 def search() -> Response:
@@ -87,16 +100,8 @@ def search() -> Response:
 
     # --- Input validation and query building ---
     card_name = card_name.strip()
-    if not card_name:
-        error_message = "Card name cannot be empty."
-        return render_template('error.html', message=error_message)
-    if len(card_name) > 100:
-        error_message = "Card name is too long."
-        return render_template('error.html', message=error_message)
-    # Allow a wider range of characters including letters, numbers, spaces,
-    # and common punctuation like apostrophes, commas, colons, and hyphens.
-    if not re.fullmatch(r"[\w\s',:/-]+", card_name):
-        error_message = "Card name contains invalid characters."
+    error_message = _validate_card_name(card_name)
+    if error_message:
         return render_template('error.html', message=error_message)
 
     # Build the Scryfall query string
