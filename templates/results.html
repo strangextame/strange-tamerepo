@@ -18,10 +18,10 @@
 <nav aria-label="Search results navigation" class="mt-5">
   <ul class="pagination justify-content-center">
     <li class="page-item {% if page <= 1 %}disabled{% endif %}">
-      <a class="page-link" href="{{ url_for('search', search_query=search_term, card_type=card_type, page=page-1) }}">Previous</a>
+      <a class="page-link" href="{{ url_for('search', search_query=corrected_search_term, card_type=card_type, page=page-1) }}">Previous</a>
     </li>
     <li class="page-item {% if not has_more %}disabled{% endif %}">
-      <a class="page-link" href="{{ url_for('search', search_query=search_term, card_type=card_type, page=page+1) }}">Next</a>
+      <a class="page-link" href="{{ url_for('search', search_query=corrected_search_term, card_type=card_type, page=page+1) }}">Next</a>
     </li>
   </ul>
 </nav>

@@ -99,13 +99,21 @@ def search() -> Response:
 
 
     # --- Input validation and query building ---
-    card_name = card_name.strip()
-    error_message = _validate_card_name(card_name)
+    original_search_term = card_name.strip()
+    error_message = _validate_card_name(original_search_term)
     if error_message:
         return render_template('error.html', message=error_message)
 
-    # Build the Scryfall query string
-    query = card_name
+    # For new searches, use autocomplete to find the most likely intended card.
+    # This makes partial searches like "delver" resolve to "Delver of Secrets".
+    search_term_for_api = original_search_term
+    if request.method == 'POST':
+        suggestions = fetch_autocomplete_suggestions(original_search_term)
+        if suggestions:
+            # Use Scryfall's exact name syntax: !"Card Name"
+            search_term_for_api = f'!"{suggestions[0]}"'
+
+    query = search_term_for_api
     if card_type:
         # Add the type filter to the query, e.g., "Sol Ring type:artifact"
         query += f" type:{card_type}"
@@ -118,7 +126,8 @@ def search() -> Response:
         # Pass the list of cards and all necessary pagination data to the template
         return render_template('results.html',
                                cards=search_result.get("data", []),
-                               search_term=card_name,
+                               search_term=original_search_term, # Display what the user typed
+                               corrected_search_term=search_term_for_api, # Use the corrected term for pagination
                                card_type=card_type,
                                page=page,
                                has_more=search_result.get("has_more", False),

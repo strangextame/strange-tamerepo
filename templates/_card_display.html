@@ -2,19 +2,35 @@
   This macro renders a single card face.
   - face: The card face object (or the card object itself for single-faced cards).
   - classes: Optional CSS classes for the container div.
+  - set_name: The name of the set the card belongs to.
 #}
-{% macro render_face(face, classes='') %}
+{% macro render_face(face, set_name, classes='') %}
   <div class="{{ classes }}">
     <div class="d-flex justify-content-between align-items-start">
       <h6 class="card-title mb-1 flex-grow-1 me-2 text-truncate" style="min-width: 0;" title="{{ face.name }}">{{ face.name }}</h6>
       <div class="text-nowrap">{{ face.mana_cost | mana }}</div>
     </div>
     <p class="card-text text-body-secondary">{{ face.type_line }}</p>
+    <p class="card-text text-body-secondary text-truncate" title="{{ set_name }}"><small>{{ set_name }}</small></p>
   </div>
 {% endmacro %}
 
 <a href="{{ card.related_uris.edhrec if card.related_uris and card.related_uris.edhrec else '#' }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
   <div class="card shadow-sm h-100 d-flex flex-column">
+    {# --- Variant Badge --- #}
+    <div class="position-relative">
+      {% set variant = '' %}
+      {% if card.borderless %}
+        {% set variant = 'Borderless' %}
+      {% elif card.frame_effects and 'showcase' in card.frame_effects %}
+        {% set variant = 'Showcase' %}
+      {% elif card.frame_effects and 'extendedart' in card.frame_effects %}
+        {% set variant = 'Extended Art' %}
+      {% endif %}
+      {% if variant %}
+        <span class="badge text-bg-primary position-absolute top-0 start-0 m-2" style="z-index: 1;">{{ variant }}</span>
+      {% endif %}
+
     {% if card.card_faces %}
       {# This is a double-faced card, display faces side-by-side #}
       <div class="row g-0">
@@ -31,7 +47,7 @@
       <div class="row g-0 flex-grow-1">
         {% for face in card.card_faces %}
           {# Call the macro for each face #}
-          {{ render_face(face, classes='col-6 card-body d-flex flex-column' + (' border-end' if not loop.last else '')) }}
+          {{ render_face(face, card.set_name, classes='col-6 card-body d-flex flex-column' + (' border-end' if not loop.last else '')) }}
         {% endfor %}
       </div>
     {% else %}
@@ -42,8 +58,9 @@
         <svg class="bd-placeholder-img card-img-top" width="100%" height="320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: No image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">No image</text></svg>
       {% endif %}
       {# Call the macro for the single-faced card #}
-      {{ render_face(card, classes='card-body d-flex flex-column') }}
+      {{ render_face(card, card.set_name, classes='card-body d-flex flex-column') }}
     {% endif %}
+    </div>
 
     {# Pricing information - common to both card types #}
     <div class="mt-auto pt-2 border-top mx-3 pb-2">
