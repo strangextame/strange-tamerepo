@@ -34,7 +34,10 @@
             {% set display_cost = card.mana_cost %}
             {% if not display_cost and card.card_faces %}
               {% for face in card.card_faces %}
-                {% if face.mana_cost %}{% set display_cost = face.mana_cost %}{% break %}{% endif %}
+                {% if face.mana_cost %}
+                  {% set display_cost = face.mana_cost %}
+                  {% break %} {# Found a mana cost, no need to check further faces #}
+                {% endif %}
               {% endfor %}
             {% endif %}
             <div class="text-nowrap ms-2">{{ display_cost | mana }}</div>
