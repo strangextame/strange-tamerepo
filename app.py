@@ -72,7 +72,7 @@ def _validate_card_name(card_name: str) -> str | None:
         return "Card name is too long."
     # This regex allows for an optional '!' and optional quotes around the name,
     # which is needed for the exact-name search syntax used in pagination.
-    if not re.fullmatch(r"!?\"?[\w\s',:/-]+\"?", card_name):
+    if not re.fullmatch(r"!?\\"?[\w\s',:/-]+\\"?", card_name):
         return "Card name contains invalid characters."
     return None
 
