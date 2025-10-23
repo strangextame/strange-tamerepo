@@ -167,10 +167,10 @@ def search() -> Response:
     if search_result and search_result.get("data"):
         # Pass the list of cards and all necessary pagination data to the template
         return render_template('results.html',
-                               # Results for the active tab
-                               cards=exact_results.get("data") if is_ambiguous_search else search_result.get("data", []),
-                               # Separate results for the "All Cards" tab
-                               broad_search_cards=search_result.get("data", []) if is_ambiguous_search else None,
+                               # "All Cards" is now the default, so it gets the main 'cards' variable
+                               cards=search_result.get("data", []),
+                               # Pass exact results separately for the secondary tab
+                               exact_search_cards=exact_results.get("data") if is_ambiguous_search else None,
                                search_term=original_search_term, # Display what the user typed
                                is_ambiguous_search=is_ambiguous_search,
                                exact_search_term=exact_search_term,

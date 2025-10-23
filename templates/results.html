@@ -13,21 +13,20 @@
 {% if is_ambiguous_search %}
   <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
-      <button class="nav-link active" id="top-result-tab" data-bs-toggle="tab" data-bs-target="#top-result-pane" type="button" role="tab" aria-controls="top-result-pane" aria-selected="true">Top Result: {{ exact_search_term }}</button>
+      <button class="nav-link active" id="all-cards-tab" data-bs-toggle="tab" data-bs-target="#all-cards-pane" type="button" role="tab" aria-controls="all-cards-pane" aria-selected="true">All Cards</button>
     </li>
     <li class="nav-item" role="presentation">
-      <button class="nav-link" id="all-cards-tab" data-bs-toggle="tab" data-bs-target="#all-cards-pane" type="button" role="tab" aria-controls="all-cards-pane" aria-selected="false">All Cards</button>
+      <button class="nav-link" id="top-result-tab" data-bs-toggle="tab" data-bs-target="#top-result-pane" type="button" role="tab" aria-controls="top-result-pane" aria-selected="false">Top Result: {{ exact_search_term }}</button>
     </li>
   </ul>
 {% endif %}
 {# Tab content panes #}
 <div class="tab-content" id="myTabContent">
-  <div class="tab-pane fade show active" id="top-result-pane" role="tabpanel" aria-labelledby="top-result-tab" tabindex="0">
-    {# If it's an ambiguous search, the 'cards' variable holds the exact results.
-       If it's NOT an ambiguous search, 'cards' holds the only result set. #}
+  <div class="tab-pane fade" id="top-result-pane" role="tabpanel" aria-labelledby="top-result-tab" tabindex="0">
+    {# This pane now shows the exact search results #}
     {% if cards %}
       <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-        {% for card in cards %}
+        {% for card in exact_search_cards %}
           <div class="col">
             {% include '_card_display.html' %}
           </div>
@@ -36,9 +35,10 @@
     {% endif %}
   </div>
   {% if is_ambiguous_search %}
-    <div class="tab-pane fade" id="all-cards-pane" role="tabpanel" aria-labelledby="all-cards-tab" tabindex="0">
+    <div class="tab-pane fade show active" id="all-cards-pane" role="tabpanel" aria-labelledby="all-cards-tab" tabindex="0">
       <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-        {% for card in broad_search_cards %}
+        {# This pane now shows the broad search results, which are in the main 'cards' variable #}
+        {% for card in cards %}
           <div class="col">
             {% include '_card_display.html' %}
           </div>
