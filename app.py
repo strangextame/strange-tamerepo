@@ -70,7 +70,7 @@ def _validate_card_name(card_name: str) -> str | None:
         return "Card name cannot be empty."
     if len(card_name) > 100:
         return "Card name is too long."
-    if not re.fullmatch(r"[\w\s',:/-]+", card_name):
+    if not re.fullmatch(r"[\w\s',:/-]+\"?\!?\"?", card_name):
         return "Card name contains invalid characters."
     return None
 
