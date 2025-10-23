@@ -11,20 +11,47 @@
   <div class="col">
     <a href="{{ card.related_uris.edhrec if card.related_uris and card.related_uris.edhrec else '#' }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
       <div class="card shadow-sm h-100">
-        {% if card.image_uris and card.image_uris.normal %}
-          <img src="{{ card.image_uris.normal }}" class="card-img-top" alt="{{ card.name }}">
-        {% else %}
-          {# Placeholder for cards without images, like double-faced card backs #}
-          <svg class="bd-placeholder-img card-img-top" width="100%" height="320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: No image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">No image</text></svg>
-        {% endif %}
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-start">
-            <h5 class="card-title mb-1">{{ card.name }}</h5>
-            <div class="text-nowrap ms-2">{{ card.mana_cost | mana }}</div>
+        {% if card.card_faces %}
+          {# This is a double-faced card, iterate through each face #}
+          <div class="row g-0">
+            {% for face in card.card_faces %}
+              <div class="col-6">
+                {% if face.image_uris and face.image_uris.normal %}
+                  <img src="{{ face.image_uris.normal }}" class="card-img-top" alt="{{ face.name }}">
+                {% else %}
+                  <svg class="bd-placeholder-img card-img-top" width="100%" height="165" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: No image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">No image</text></svg>
+                {% endif %}
+              </div>
+            {% endfor %}
           </div>
-          <p class="card-text text-body-secondary">{{ card.type_line }}</p>
-        </div>
-      </div>
+          <div class="row g-0 flex-grow-1">
+            {% for face in card.card_faces %}
+            <div class="col-6 card-body d-flex flex-column {% if not loop.last %}border-end{% endif %}">
+              <div class="d-flex justify-content-between align-items-start">
+                <h6 class="card-title mb-1 flex-grow-1 me-2 text-truncate" style="min-width: 0;">{{ face.name }}</h6>
+                <div class="text-nowrap">{{ face.mana_cost | mana }}</div>
+              </div>
+              <p class="card-text text-body-secondary">{{ face.type_line }}</p>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          {# This is a single-faced card #}
+          {% if card.image_uris and card.image_uris.normal %}
+            <img src="{{ card.image_uris.normal }}" class="card-img-top" alt="{{ card.name }}">
+          {% else %}
+            {# Placeholder for cards without images #}
+            <svg class="bd-placeholder-img card-img-top" width="100%" height="320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: No image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">No image</text></svg>
+          {% endif %}
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <h6 class="card-title mb-1 flex-grow-1 me-2 text-truncate" style="min-width: 0;">{{ card.name }}</h6>
+              <div class="text-nowrap">{{ card.mana_cost | mana }}</div>
+            </div>
+            <p class="card-text text-body-secondary">{{ card.type_line }}</p>
+          </div>
+        {% endif %}
+      </div> <!-- This was the misplaced div -->
     </a>
   </div>
   {% endfor %}

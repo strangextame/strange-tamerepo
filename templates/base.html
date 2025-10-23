@@ -81,23 +81,6 @@
     <div id="scryfall-watermark-container">
         <span class="text-body-secondary">Powered by <a href="https://scryfall.com/docs/api" target="_blank" rel="noopener noreferrer" class="scryfall-attribution-link">Scryfall API</a></span>
     </div>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">Magic Card Finder</a>
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <li class="nav-item dropdown">
-                    <button class="btn btn-dark dropdown-toggle" id="theme-switcher" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-circle-half"></i> Theme
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="theme-switcher">
-                        <li><button class="dropdown-item d-flex align-items-center" type="button" data-bs-theme-value="light"><i class="bi bi-sun-fill me-2"></i> Light</button></li>
-                        <li><button class="dropdown-item d-flex align-items-center" type="button" data-bs-theme-value="dark"><i class="bi bi-moon-stars-fill me-2"></i> Dark</button></li>
-                        <li><button class="dropdown-item d-flex align-items-center" type="button" data-bs-theme-value="auto"><i class="bi bi-circle-half me-2"></i> Auto</button></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </nav>
 
     <main class="container my-4 my-md-5">
         {% block content %}{% endblock %}
