@@ -61,32 +61,33 @@ def autocomplete() -> Response:
     # Return the list of suggestions as a JSON response
     return jsonify(suggestions)
 
-def _validate_card_name(card_name: str) -> str | None:
+def _validate_search_input(card_name: str, card_type: str) -> str | None:
     """
-    Validates the card name against a set of rules.
+    Validates the search inputs.
     Returns an error message string if validation fails, otherwise None.
     """
-    if not card_name:
-        return "Card name cannot be empty."
+    if not card_name and not card_type:
+        return "Please enter a card name or select a card type to search."
+
     if len(card_name) > 100:
         return "Card name is too long."
 
     # --- Overhauled Validation Logic ---
     # Instead of a complex regex that is prone to syntax errors on deployment,
     # we will use a more direct and robust character-by-character validation.
-
     # Define all allowed characters for a card name.
     allowed_chars = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ',:/-")
 
-    # Temporarily strip the exact-search syntax for validation purposes.
-    name_to_check = card_name
-    if name_to_check.startswith('!"') and name_to_check.endswith('"'):
-        name_to_check = name_to_check[2:-1]
+    if card_name:
+        # Temporarily strip the exact-search syntax for validation purposes.
+        name_to_check = card_name
+        if name_to_check.startswith('!"') and name_to_check.endswith('"'):
+            name_to_check = name_to_check[2:-1]
 
-    # Check each character in the name.
-    for char in name_to_check:
-        if char not in allowed_chars:
-            return f"Card name contains an invalid character: '{char}'"
+        # Check each character in the name.
+        for char in name_to_check:
+            if char not in allowed_chars:
+                return f"Card name contains an invalid character: '{char}'"
 
     return None
 
@@ -116,7 +117,7 @@ def search() -> Response:
 
     # --- Input validation and query building ---
     original_search_term = card_name.strip()
-    error_message = _validate_card_name(original_search_term)
+    error_message = _validate_search_input(original_search_term, card_type)
     if error_message:
         return render_template('error.html', message=error_message)
 
@@ -131,29 +132,33 @@ def search() -> Response:
     broad_results = None
     is_ambiguous_search = False
 
-    if request.method == 'POST':
-        suggestions = fetch_autocomplete_suggestions(original_search_term)
-        if suggestions:
-            exact_search_term = suggestions[0]
-            # Only perform two searches if the top suggestion is different from the user's term
-            if original_search_term.lower() != exact_search_term.lower():
-                is_ambiguous_search = True
-                # 1. Get the exact results
-                exact_query = f'!"{exact_search_term}"'
-                if card_type: exact_query += f" type:{card_type}"
-                exact_results = fetch_cards(exact_query, page=1)
+    # Only perform "smart" exact/broad search if a card name was provided
+    if original_search_term:
+        if request.method == 'POST':
+            suggestions = fetch_autocomplete_suggestions(original_search_term)
+            if suggestions:
+                exact_search_term = suggestions[0]
+                # Only perform two searches if the top suggestion is different from the user's term
+                if original_search_term.lower() != exact_search_term.lower():
+                    is_ambiguous_search = True
+                    # 1. Get the exact results
+                    exact_query = f'!"{exact_search_term}"'
+                    if card_type: exact_query += f" type:{card_type}"
+                    exact_results = fetch_cards(exact_query, page=1)
 
-        # 2. Get the broad results (or the only results if search was already exact)
-        broad_query = original_search_term
-        if card_type: broad_query += f" type:{card_type}"
-        broad_results = fetch_cards(broad_query, page=page)
+            # 2. Get the broad results (or the only results if search was already exact)
+            broad_query = original_search_term
+            if card_type: broad_query += f" type:{card_type}"
+            broad_results = fetch_cards(broad_query, page=page)
 
-    else: # GET request for pagination
-        # For pagination, we only need to query for the broad results.
-        # The "Top Result" tab doesn't need pagination as it shows all printings at once.
-        broad_query = original_search_term
-        if card_type: broad_query += f" type:{card_type}"
-        broad_results = fetch_cards(broad_query, page=page)
+        else: # GET request for pagination
+            # For pagination, we only need to query for the broad results.
+            broad_query = original_search_term
+            if card_type: broad_query += f" type:{card_type}"
+            broad_results = fetch_cards(broad_query, page=page)
+    else: # No card name provided, so it's a type-only search
+        query = f"type:{card_type}"
+        broad_results = fetch_cards(query, page=page)
 
     # Determine which result set to use for the main display
     search_result = broad_results

@@ -4,7 +4,11 @@
 
 {% block content %}
 <a href="/" class="btn btn-outline-secondary mb-4">&larr; New Search</a>
-<h2 class="mb-4">Results for "{{ search_term }}" <span class="fs-5 text-body-secondary">({{ total_cards }} cards found)</span></h2>
+{% if search_term %}
+  <h2 class="mb-4">Results for "{{ search_term }}" <span class="fs-5 text-body-secondary">({{ total_cards }} cards found)</span></h2>
+{% else %}
+  <h2 class="mb-4">Results for Type: {{ card_type|capitalize }} <span class="fs-5 text-body-secondary">({{ total_cards }} cards found)</span></h2>
+{% endif %}
 {# Tab navigation for ambiguous searches #}
 {% if is_ambiguous_search %}
   <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
@@ -19,14 +23,17 @@
 {# Tab content panes #}
 <div class="tab-content" id="myTabContent">
   <div class="tab-pane fade show active" id="top-result-pane" role="tabpanel" aria-labelledby="top-result-tab" tabindex="0">
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-      {% for card in cards %}
-        <div class="col">
-          {% include '_card_display.html' %}
-        </div>
-      {% endfor %}
-    </div>
-    {# No pagination needed for "Top Result" as it shows all printings #}
+    {# If it's an ambiguous search, the 'cards' variable holds the exact results.
+       If it's NOT an ambiguous search, 'cards' holds the only result set. #}
+    {% if cards %}
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% for card in cards %}
+          <div class="col">
+            {% include '_card_display.html' %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
   </div>
   {% if is_ambiguous_search %}
     <div class="tab-pane fade" id="all-cards-pane" role="tabpanel" aria-labelledby="all-cards-tab" tabindex="0">
@@ -49,6 +56,19 @@
         </ul>
       </nav>
     </div>
+  {% endif %}
+  {# Pagination for non-ambiguous or type-only searches #}
+  {% if not is_ambiguous_search %}
+    <nav aria-label="Search results navigation" class="mt-5">
+      <ul class="pagination justify-content-center">
+        <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+          <a class="page-link" href="{{ url_for('search', search_query=search_term, card_type=card_type, page=page-1) }}">Previous</a>
+        </li>
+        <li class="page-item {% if not has_more %}disabled{% endif %}">
+          <a class="page-link" href="{{ url_for('search', search_query=search_term, card_type=card_type, page=page+1) }}">Next</a>
+        </li>
+      </ul>
+    </nav>
   {% endif %}
 </div>
 
