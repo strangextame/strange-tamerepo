@@ -70,10 +70,24 @@ def _validate_card_name(card_name: str) -> str | None:
         return "Card name cannot be empty."
     if len(card_name) > 100:
         return "Card name is too long."
-    # This regex allows for an optional '!' and optional quotes around the name,
-    # which is needed for the exact-name search syntax used in pagination.
-    if not re.fullmatch(r'!?\"?[\w\s\',:/-]+\"?', card_name):
-        return "Card name contains invalid characters."
+
+    # --- Overhauled Validation Logic ---
+    # Instead of a complex regex that is prone to syntax errors on deployment,
+    # we will use a more direct and robust character-by-character validation.
+
+    # Define all allowed characters for a card name.
+    allowed_chars = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ',:/-")
+
+    # Temporarily strip the exact-search syntax for validation purposes.
+    name_to_check = card_name
+    if name_to_check.startswith('!"') and name_to_check.endswith('"'):
+        name_to_check = name_to_check[2:-1]
+
+    # Check each character in the name.
+    for char in name_to_check:
+        if char not in allowed_chars:
+            return f"Card name contains an invalid character: '{char}'"
+
     return None
 
 # Route to handle card search (handles POST for new search, GET for pagination)
@@ -110,12 +124,14 @@ def search() -> Response:
     # This makes partial searches like "delver" resolve to "Delver of Secrets".
     search_term_for_api = original_search_term
     if request.method == 'POST':
+        is_new_search = True
         suggestions = fetch_autocomplete_suggestions(original_search_term)
         if suggestions:
             # Use Scryfall's exact name syntax: !"Card Name"
             search_term_for_api = f'!"{suggestions[0]}"'
-
-    query = search_term_for_api
+    else: # This is a GET request (pagination)
+        is_new_search = False
+    query = search_term_for_api if request.method == 'POST' else original_search_term
     if card_type:
         # Add the type filter to the query, e.g., "Sol Ring type:artifact"
         query += f" type:{card_type}"
@@ -129,12 +145,45 @@ def search() -> Response:
         return render_template('results.html',
                                cards=search_result.get("data", []),
                                search_term=original_search_term, # Display what the user typed
-                               corrected_search_term=search_term_for_api, # Use the corrected term for pagination
+                               # For new searches, pagination uses the corrected term. For broad searches, it uses the original.
+                               corrected_search_term=search_term_for_api if is_new_search else original_search_term,
+                               is_corrected_search=(search_term_for_api != original_search_term and is_new_search),
                                card_type=card_type,
                                page=page,
                                has_more=search_result.get("has_more", False),
                                total_cards=search_result.get("total_cards", 0)
                                )
+    else:
+        # Render a user‑friendly error page
+        error_message = f"Sorry, no cards matching your search for '{query}' were found."
+        return render_template('error.html', message=error_message)
+
+@app.route('/search/broad')
+def broad_search() -> Response:
+    """
+    Handles a "broad" search request that does not use the exact name logic.
+    This is used as a fallback from the main, precise search.
+    """
+    card_name = request.args.get('search_query', '')
+    card_type = request.args.get('card_type', '')
+    page = request.args.get('page', 1, type=int)
+
+    query = card_name.strip()
+    if card_type:
+        query += f" type:{card_type}"
+
+    search_result = fetch_cards(query, page=page)
+
+    if search_result and search_result.get("data"):
+        return render_template('results.html',
+                               cards=search_result.get("data", []),
+                               search_term=card_name,
+                               corrected_search_term=card_name, # No correction in broad search
+                               is_corrected_search=False, # This is not a corrected search
+                               card_type=card_type,
+                               page=page,
+                               has_more=search_result.get("has_more", False),
+                               total_cards=search_result.get("total_cards", 0))
     else:
         # Render a user‑friendly error page
         error_message = f"Sorry, no cards matching your search for '{query}' were found."

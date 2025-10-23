@@ -54,6 +54,19 @@
         max-height: 400px; /* Limit the height of the suggestions */
         overflow-y: auto;  /* Add a vertical scrollbar when needed */
       }
+      /* Custom styles for autocomplete suggestions to match watermark look */
+      #suggestions-panel .list-group-item {
+          color: var(--bs-secondary-color); /* Grey text */
+          text-decoration: underline;      /* Always underlined */
+          background-color: var(--bs-body-bg);
+          border-color: var(--bs-border-color);
+      }
+      #suggestions-panel .list-group-item:hover,
+      #suggestions-panel .list-group-item:focus {
+          color: var(--bs-body-color); /* Darken text on hover/focus */
+          background-color: var(--bs-tertiary-bg); /* Subtle background change */
+      }
+
 
       /* Styles for the fixed Scryfall watermark */
       #scryfall-watermark-container {

@@ -6,6 +6,11 @@
 <a href="/" class="btn btn-outline-secondary mb-4">&larr; New Search</a>
 <h2 class="mb-4">Results for "{{ search_term }}" <span class="fs-5 text-body-secondary">({{ total_cards }} cards found)</span></h2>
 
+{% if is_corrected_search %}
+  <p class="text-body-secondary mb-4">Showing results for <strong class="text-body">{{ corrected_search_term | replace('!', '') | replace('"', '') }}</strong>.
+    <a href="{{ url_for('broad_search', search_query=search_term, card_type=card_type) }}">Search for cards containing "{{ search_term }}" instead?</a></p>
+{% endif %}
+
 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
   {% for card in cards %}
   <div class="col">
