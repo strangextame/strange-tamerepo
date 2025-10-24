@@ -107,12 +107,14 @@ def search() -> Response:
         card_name = request.form.get('search_query', '')
         card_type = request.form.get('card_type', '')
         page = 1
+        sort_by = request.form.get('sort_by', 'usd') # Default sort by USD
     else: # request.method == 'GET'
         # Navigating via pagination links
         card_name = request.args.get('search_query', '')
         card_type = request.args.get('card_type', '')
         # Ensure page is an integer, default to 1
         page = request.args.get('page', 1, type=int)
+        sort_by = request.args.get('sort_by', 'usd') # Default sort by USD
 
 
     # --- Input validation and query building ---
@@ -142,23 +144,23 @@ def search() -> Response:
                 if original_search_term.lower() != exact_search_term.lower():
                     is_ambiguous_search = True
                     # 1. Get the exact results
-                    exact_query = f'!"{exact_search_term}"'
+                    exact_query = f'!"{exact_search_term}"' # Exact search should not be paginated, always page 1
                     if card_type: exact_query += f" type:{card_type}"
-                    exact_results = fetch_cards(exact_query, page=1)
+                    exact_results = fetch_cards(exact_query, page=1, sort_order=sort_by)
 
             # 2. Get the broad results (or the only results if search was already exact)
             broad_query = original_search_term
             if card_type: broad_query += f" type:{card_type}"
-            broad_results = fetch_cards(broad_query, page=page)
+            broad_results = fetch_cards(broad_query, page=page, sort_order=sort_by)
 
         else: # GET request for pagination
             # For pagination, we only need to query for the broad results.
             broad_query = original_search_term
             if card_type: broad_query += f" type:{card_type}"
-            broad_results = fetch_cards(broad_query, page=page)
+            broad_results = fetch_cards(broad_query, page=page, sort_order=sort_by)
     else: # No card name provided, so it's a type-only search
         query = f"type:{card_type}"
-        broad_results = fetch_cards(query, page=page)
+        broad_results = fetch_cards(query, page=page, sort_order=sort_by)
 
     # Determine which result set to use for the main display
     search_result = broad_results
@@ -175,6 +177,7 @@ def search() -> Response:
                                is_ambiguous_search=is_ambiguous_search,
                                exact_search_term=exact_search_term,
                                card_type=card_type,
+                               sort_by=sort_by, # Pass sort_by to the template
                                page=page,
                                has_more=search_result.get("has_more", False),
                                total_cards=search_result.get("total_cards", 0)
