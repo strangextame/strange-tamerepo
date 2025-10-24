@@ -7,10 +7,12 @@ This module handles web routing and delegates search logic to the SearchService.
 
 # We need 'request' to access the data sent by the user's form
 from flask import Flask, jsonify, render_template, request, Response
-from config import DevelopmentConfig
+from config import get_config
 # Import the Scryfall client wrapper
-from markupsafe import Markup # Markup is used for the mana filter
-from scryfall_client import fetch_autocomplete_suggestions, fetch_cards # Changed from fetch_card to fetch_cards
+from markupsafe import Markup
+# Import specific functions to use them directly
+from scryfall_client import fetch_autocomplete_suggestions, fetch_cards
+import scryfall_client # Import the module itself to access its variables
 import re
 
 class SearchService:
@@ -38,7 +40,8 @@ class SearchService:
         return None
 
 app = Flask(__name__)
-app.config.from_object(DevelopmentConfig) # Load configuration
+app.config.from_object(get_config()) # Load configuration dynamically
+scryfall_client.SCRYFALL_API_BASE_URL = app.config['SCRYFALL_API_BASE_URL'] # Configure Scryfall client
 search_service = SearchService() # Create a single instance of our service
 
 @app.template_filter('mana')

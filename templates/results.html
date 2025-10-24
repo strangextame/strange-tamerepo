@@ -43,7 +43,7 @@
         {% endfor %}
       </div>
       <!-- Pagination Controls for Broad Search -->
-      <nav aria-label="Broad search results navigation" class="mt-5">
+      <nav aria-label="Broad search results navigation" class="mt-5 mb-5">
         <ul class="pagination justify-content-center">
           <li class="page-item {% if page <= 1 %}disabled{% endif %}">
             <a class="page-link" href="{{ url_for('search', search_query=search_term, card_type=card_type, page=page-1) }}">Previous</a>
@@ -66,7 +66,7 @@
       {% endfor %}
     </div>
     <!-- Pagination for non-ambiguous or type-only searches -->
-    <nav aria-label="Search results navigation" class="mt-5">
+    <nav aria-label="Search results navigation" class="mt-5 mb-5">
       <ul class="pagination justify-content-center">
         <li class="page-item {% if page <= 1 %}disabled{% endif %}">
           <a class="page-link" href="{{ url_for('search', search_query=search_term, card_type=card_type, page=page-1) }}">Previous</a>
