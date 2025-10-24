@@ -18,3 +18,17 @@ class Config:
 class DevelopmentConfig(Config):
     """Development configuration."""
     DEBUG = True
+
+class ProductionConfig(Config):
+    """Production configuration."""
+    # In a real production environment, SECRET_KEY should be a strong,
+    # randomly generated value and loaded from an environment variable.
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'a-fallback-secret-key-CHANGE-ME-IN-PROD')
+    DEBUG = False
+    TESTING = False
+
+def get_config():
+    """Returns the appropriate configuration class based on FLASK_ENV."""
+    if os.environ.get('FLASK_ENV') == 'production':
+        return ProductionConfig
+    return DevelopmentConfig

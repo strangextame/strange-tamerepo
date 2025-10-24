@@ -13,7 +13,7 @@ import requests
 # Configure a module‑level logger. The application can configure the
 # logging level globally if desired.
 logger = logging.getLogger(__name__)
-
+# This will be configured by app.py based on the active Flask configuration
 SCRYFALL_API_BASE_URL = "https://api.scryfall.com"
 session = requests.Session()
 
