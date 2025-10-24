@@ -32,6 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Resolved a `TypeError` on the search results page that occurred when an exact search returned no results.
 - Corrected a logic error in `results.html` where cards would not display for non-ambiguous or type-only searches.
+- Fixed a `NameError` on application startup related to `scryfall_client` configuration.
+- Resolved a UI layout issue where pagination controls would overlap with the fixed footer by ensuring the main content area expands correctly.
 - Ensured the selected light/dark theme preference now correctly persists across all pages, including search results.
 
 ### Security
