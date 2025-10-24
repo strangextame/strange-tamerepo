@@ -24,17 +24,15 @@
 <div class="tab-content" id="myTabContent">
   <div class="tab-pane fade" id="top-result-pane" role="tabpanel" aria-labelledby="top-result-tab" tabindex="0">
     {# This pane now shows the exact search results #}
-    {% if cards %}
-      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-        {% for card in exact_search_cards %}
-          <div class="col">
-            {% include '_card_display.html' %}
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+      {% for card in exact_search_cards %}
+        <div class="col">
+          {% include '_card_display.html' %}
+        </div>
+      {% endfor %}
+    </div>
   </div>
-  {% if is_ambiguous_search %}
+  {% if is_ambiguous_search %} {# This block is for the "All Cards" tab in an ambiguous search #}
     <div class="tab-pane fade show active" id="all-cards-pane" role="tabpanel" aria-labelledby="all-cards-tab" tabindex="0">
       <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
         {# This pane now shows the broad search results, which are in the main 'cards' variable #}
@@ -57,8 +55,17 @@
       </nav>
     </div>
   {% endif %}
-  {# Pagination for non-ambiguous or type-only searches #}
-  {% if not is_ambiguous_search %}
+
+  {# This block handles non-ambiguous and type-only searches #}
+  {% if not is_ambiguous_search and cards %}
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+      {% for card in cards %}
+        <div class="col">
+          {% include '_card_display.html' %}
+        </div>
+      {% endfor %}
+    </div>
+    <!-- Pagination for non-ambiguous or type-only searches -->
     <nav aria-label="Search results navigation" class="mt-5">
       <ul class="pagination justify-content-center">
         <li class="page-item {% if page <= 1 %}disabled{% endif %}">

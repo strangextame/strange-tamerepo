@@ -1,8 +1,8 @@
 """
 MTG Card Finder Flask Application.
 
-Provides a simple web interface to search Magic: The Gathering cards via the
-Scryfall API.
+Provides a web interface to search Magic: The Gathering cards.
+This module handles web routing and delegates search logic to the SearchService.
 """
 
 # We need 'request' to access the data sent by the user's form
@@ -12,7 +12,32 @@ from markupsafe import Markup # Markup is used for the mana filter
 from scryfall_client import fetch_autocomplete_suggestions, fetch_cards # Changed from fetch_card to fetch_cards
 import re
 
+class SearchService:
+    """
+    Encapsulates the business logic for validating and preparing card searches.
+    """
+    _ALLOWED_CHARS = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ',:/-")
+
+    def validate_search_input(self, card_name: str, card_type: str) -> str | None:
+        """
+        Validates the search inputs.
+        Returns an error message string if validation fails, otherwise None.
+        """
+        if not card_name and not card_type:
+            return "Please enter a card name or select a card type to search."
+
+        if len(card_name) > 100:
+            return "Card name is too long."
+
+        name_to_check = card_name.strip('!"') if card_name.startswith('!"') and card_name.endswith('"') else card_name
+        for char in name_to_check:
+            if char not in self._ALLOWED_CHARS:
+                return f"Card name contains an invalid character: '{char}'"
+
+        return None
+
 app = Flask(__name__)
+search_service = SearchService() # Create a single instance of our service
 
 @app.template_filter('mana')
 def mana_symbols(mana_cost_str: str) -> Markup:
@@ -61,36 +86,6 @@ def autocomplete() -> Response:
     # Return the list of suggestions as a JSON response
     return jsonify(suggestions)
 
-def _validate_search_input(card_name: str, card_type: str) -> str | None:
-    """
-    Validates the search inputs.
-    Returns an error message string if validation fails, otherwise None.
-    """
-    if not card_name and not card_type:
-        return "Please enter a card name or select a card type to search."
-
-    if len(card_name) > 100:
-        return "Card name is too long."
-
-    # --- Overhauled Validation Logic ---
-    # Instead of a complex regex that is prone to syntax errors on deployment,
-    # we will use a more direct and robust character-by-character validation.
-    # Define all allowed characters for a card name.
-    allowed_chars = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ',:/-")
-
-    if card_name:
-        # Temporarily strip the exact-search syntax for validation purposes.
-        name_to_check = card_name
-        if name_to_check.startswith('!"') and name_to_check.endswith('"'):
-            name_to_check = name_to_check[2:-1]
-
-        # Check each character in the name.
-        for char in name_to_check:
-            if char not in allowed_chars:
-                return f"Card name contains an invalid character: '{char}'"
-
-    return None
-
 # Route to handle card search (handles POST for new search, GET for pagination)
 @app.route('/search', methods=['GET', 'POST'])
 def search() -> Response:
@@ -117,7 +112,7 @@ def search() -> Response:
 
     # --- Input validation and query building ---
     original_search_term = card_name.strip()
-    error_message = _validate_search_input(original_search_term, card_type)
+    error_message = search_service.validate_search_input(original_search_term, card_type)
     if error_message:
         return render_template('error.html', message=error_message)
 
@@ -170,7 +165,7 @@ def search() -> Response:
                                # "All Cards" is now the default, so it gets the main 'cards' variable
                                cards=search_result.get("data", []),
                                # Pass exact results separately for the secondary tab
-                               exact_search_cards=exact_results.get("data") if is_ambiguous_search else None,
+                               exact_search_cards=exact_results.get("data") if is_ambiguous_search and exact_results else [],
                                search_term=original_search_term, # Display what the user typed
                                is_ambiguous_search=is_ambiguous_search,
                                exact_search_term=exact_search_term,
