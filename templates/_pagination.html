@@ -1,0 +1,14 @@
+{#
+  Pagination controls partial.
+  Expects `page`, `has_more`, `search_term`, `card_type`, and `sort_by` to be in the context.
+#}
+<nav aria-label="Search results navigation" class="mt-5 mb-5">
+  <ul class="pagination justify-content-center">
+    <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+      <a class="page-link" href="{{ url_for('search', search_query=search_term, card_type=card_type, page=page-1, sort_by=sort_by) }}">Previous</a>
+    </li>
+    <li class="page-item {% if not has_more %}disabled{% endif %}">
+      <a class="page-link" href="{{ url_for('search', search_query=search_term, card_type=card_type, page=page+1, sort_by=sort_by) }}">Next</a>
+    </li>
+  </ul>
+</nav>

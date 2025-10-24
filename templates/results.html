@@ -9,6 +9,22 @@
 {% else %}
   <h2 class="mb-4">Results for Type: {{ card_type|capitalize }} <span class="fs-5 text-body-secondary">({{ total_cards }} cards found)</span></h2>
 {% endif %}
+
+{# Sort by dropdown #}
+<div class="d-flex justify-content-end mb-3">
+    <form action="{{ url_for('search') }}" method="POST" class="d-flex align-items-center">
+        <input type="hidden" name="search_query" value="{{ search_term }}">
+        <input type="hidden" name="card_type" value="{{ card_type }}">
+        <label for="sort_by" class="form-label me-2 mb-0">Sort by:</label>
+        <select class="form-select form-select-sm" id="sort_by" name="sort_by" onchange="this.form.submit()">
+            <option value="usd" {% if sort_by == 'usd' %}selected{% endif %}>Price (Low to High)</option>
+            <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Name (A-Z)</option>
+            <option value="rarity" {% if sort_by == 'rarity' %}selected{% endif %}>Rarity</option>
+            <option value="power" {% if sort_by == 'power' %}selected{% endif %}>Power</option>
+            <option value="toughness" {% if sort_by == 'toughness' %}selected{% endif %}>Toughness</option>
+        </select>
+    </form>
+</div>
 {# Tab navigation for ambiguous searches #}
 {% if is_ambiguous_search %}
   <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
@@ -42,17 +58,7 @@
           </div>
         {% endfor %}
       </div>
-      <!-- Pagination Controls for Broad Search -->
-      <nav aria-label="Broad search results navigation" class="mt-5 mb-5">
-        <ul class="pagination justify-content-center">
-          <li class="page-item {% if page <= 1 %}disabled{% endif %}">
-            <a class="page-link" href="{{ url_for('search', search_query=search_term, card_type=card_type, page=page-1) }}">Previous</a>
-          </li>
-          <li class="page-item {% if not has_more %}disabled{% endif %}">
-            <a class="page-link" href="{{ url_for('search', search_query=search_term, card_type=card_type, page=page+1) }}">Next</a>
-          </li>
-        </ul>
-      </nav>
+      {% include '_pagination.html' %}
     </div>
   {% endif %}
 
@@ -65,17 +71,7 @@
         </div>
       {% endfor %}
     </div>
-    <!-- Pagination for non-ambiguous or type-only searches -->
-    <nav aria-label="Search results navigation" class="mt-5 mb-5">
-      <ul class="pagination justify-content-center">
-        <li class="page-item {% if page <= 1 %}disabled{% endif %}">
-          <a class="page-link" href="{{ url_for('search', search_query=search_term, card_type=card_type, page=page-1) }}">Previous</a>
-        </li>
-        <li class="page-item {% if not has_more %}disabled{% endif %}">
-          <a class="page-link" href="{{ url_for('search', search_query=search_term, card_type=card_type, page=page+1) }}">Next</a>
-        </li>
-      </ul>
-    </nav>
+    {% include '_pagination.html' %}
   {% endif %}
 </div>
 

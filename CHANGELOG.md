@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added `_pagination.html` partial for reusable pagination controls.
+- Added card sorting options (by name, price, rarity, power, toughness) to search results.
 - `config.py` for managing environment-specific application settings (e.g., `DEBUG` mode).
 - `requirements.txt` and `requirements-dev.txt` to separate production and development dependencies.
 - `.flake8` configuration file to enforce consistent code style.
@@ -19,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **Refactored** `app.py` to load its configuration from `config.py`, removing hardcoded settings.
+- **Refactored** `templates/results.html` to use the new `_pagination.html` partial, removing duplicated pagination code.
 - **Refactored** `app.py` to delegate input validation to the `SearchService`, improving code structure and adhering to OOP principles.
 - **Refactored** the theme-switching mechanism to use Bootstrap 5.3+'s native `data-bs-theme` system for better compatibility and persistence.
 - **Updated** `README.md` with improved installation and running instructions, including sections for development and production environments.
