@@ -7,6 +7,7 @@ This module handles web routing and delegates search logic to the SearchService.
 
 # We need 'request' to access the data sent by the user's form
 from flask import Flask, jsonify, render_template, request, Response
+from config import DevelopmentConfig
 # Import the Scryfall client wrapper
 from markupsafe import Markup # Markup is used for the mana filter
 from scryfall_client import fetch_autocomplete_suggestions, fetch_cards # Changed from fetch_card to fetch_cards
@@ -37,6 +38,7 @@ class SearchService:
         return None
 
 app = Flask(__name__)
+app.config.from_object(DevelopmentConfig) # Load configuration
 search_service = SearchService() # Create a single instance of our service
 
 @app.template_filter('mana')
@@ -191,4 +193,5 @@ def internal_error(error):
     return render_template('error.html', message="An unexpected error occurred."), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Use the debug setting from the configuration
+    app.run(debug=app.config.get('DEBUG', False))
